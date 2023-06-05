@@ -2,11 +2,16 @@ import './style.css'
 import * as THREE from 'three'
 import gsap from 'gsap'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
+import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
+import fontSrc from 'three/examples/fonts/helvetiker_regular.typeface.json?url'
 import Snake from './snake'
 import Candy from './candy'
 
 let speed = 160
 let score = 0
+
+let text
 
 const resolution = new THREE.Vector2(25, 15)
 
@@ -147,8 +152,10 @@ renderer.setPixelRatio(pixelRatio)
 let start = false
 
 window.addEventListener('keydown', function (e) {
-	console.log(e.code)
-	e.code === 'Space' ? (start = !start) : null
+	// console.log(e.code)
+	// e.code === 'Space' ? (start = !start) : null
+
+	start = !start ? true : true
 
 	snake.setDirection(e.code)
 })
@@ -168,6 +175,8 @@ function tic() {
 		if (distance === 0) {
 			index = i
 			snake.eat(candy)
+			score++
+			createScore()
 			speed -= 1
 
 			gsap
@@ -249,6 +258,7 @@ window.addEventListener('die', reset)
 function reset() {
 	start = false
 	score = 0
+	createScore()
 	speed = 160
 
 	candies.forEach((c) => {
@@ -258,4 +268,37 @@ function reset() {
 	candies = []
 
 	addCandy()
+}
+
+let font
+let textMesh
+
+const loader = new FontLoader()
+loader.load(fontSrc, function (res) {
+	font = res
+
+	createScore()
+})
+
+function createScore() {
+	const text = `score: ${score}`
+
+	const geometry = new TextGeometry(text, {
+		font,
+		size: 1.5,
+		height: 0.2,
+	})
+
+	geometry.computeBoundingBox()
+	const centerOffset =
+		-0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x)
+
+	if (textMesh) {
+		scene.remove(textMesh)
+	}
+
+	textMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
+	textMesh.position.z = -resolution.y / 2 - 2
+	textMesh.position.x = centerOffset
+	scene.add(textMesh)
 }
