@@ -4,7 +4,7 @@ import gsap from 'gsap'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
-import fontSrc from 'three/examples/fonts/helvetiker_regular.typeface.json?url'
+import fontSrc from 'three/examples/fonts/helvetiker_bold.typeface.json?url'
 import Snake from './snake'
 import Candy from './candy'
 
