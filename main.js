@@ -154,8 +154,11 @@ let start = false
 window.addEventListener('keydown', function (e) {
 	// console.log(e.code)
 	// e.code === 'Space' ? (start = !start) : null
-
-	start = !start ? true : true
+	if (!start) {
+		start = true
+		score = 0
+		createScore()
+	}
 
 	snake.setDirection(e.code)
 })
@@ -257,8 +260,6 @@ window.addEventListener('die', reset)
 
 function reset() {
 	start = false
-	score = 0
-	createScore()
 	speed = 160
 
 	candies.forEach((c) => {
