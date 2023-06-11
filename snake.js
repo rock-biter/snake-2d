@@ -1,5 +1,11 @@
 import { gsap } from 'gsap'
-import { BoxGeometry, Mesh, MeshNormalMaterial, Vector3 } from 'three'
+import {
+	BoxGeometry,
+	Mesh,
+	MeshNormalMaterial,
+	MeshStandardMaterial,
+	Vector3,
+} from 'three'
 
 const die = new CustomEvent('die')
 
@@ -16,7 +22,9 @@ export default class Snake {
 	direction = 'd'
 	nextTicDirection = null
 
-	material = new MeshNormalMaterial()
+	material = new MeshStandardMaterial({
+		color: 0x2234ff,
+	})
 	geometry = new BoxGeometry(1, 1, 1)
 
 	scene
@@ -60,14 +68,15 @@ export default class Snake {
 
 		this.elements.push(mesh)
 		this.scene.add(mesh)
+		mesh.scale.multiplyScalar(0.95)
 
-		for (let i = this.elements.length - 1; i >= 0; i--) {
-			const el = this.elements[i]
-			const scalar = 0.92 - (0.35 / this.elements.length) * i
+		// for (let i = this.elements.length - 1; i >= 0; i--) {
+		// 	const el = this.elements[i]
+		// 	const scalar = 0.92 - (0.35 / this.elements.length) * i
 
-			console.log(scalar)
-			el.scale.copy(scale.clone().multiplyScalar(scalar))
-		}
+		// 	console.log(scalar)
+		// 	el.scale.copy(scale.clone().multiplyScalar(scalar))
+		// }
 
 		gsap.from(mesh.scale, { duration: 1, x: 0, y: 0, z: 0 })
 
