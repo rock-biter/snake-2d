@@ -84,7 +84,7 @@ export default class Grid {
         distance = length(uCandyPos - wPosition.xyz);
         vPos = vec2(wPosition.xz);
 
-        wPosition.y += sin( ( distance * 0.3 - uTime * 15.) ) *  0.1 * sin(uAnimate * 3.14 ) * smoothstep(20., 0., distance);
+        wPosition.y += sin( ( distance * 0.3 - uTime * 15.) ) *  0.3 * sin(uAnimate * 3.14 ) * smoothstep(20., 0., distance);
         mvPosition = viewMatrix * wPosition;
         
         gl_Position = projectionMatrix * mvPosition;
@@ -129,7 +129,7 @@ varying vec2 vPos;
     `
 			)
 
-			console.log(shader.fragmentShader)
+			// console.log(shader.fragmentShader)
 		}
 	}
 }

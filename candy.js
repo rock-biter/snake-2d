@@ -124,7 +124,7 @@ float snoise(vec3 v){
 				`
 			#include <begin_vertex>
 			// transformed *= 0.5 + (1. - animate) * 0.5;
-			transformed *= 1. + snoise( transformed + vec3(uTime * 0.5)) * 0.2;
+			transformed *= 1. + snoise( transformed + vec3(uTime * 0.5)) * 0.4;
 			transformed.y += animate * 5.;
 			`
 			)

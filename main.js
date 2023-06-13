@@ -4,6 +4,9 @@ import gsap from 'gsap'
 import { MapControls } from 'three/examples/jsm/controls/MapControls'
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader'
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry'
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer'
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass'
 import fontSrc from 'three/examples/fonts/helvetiker_bold.typeface.json?url'
 import Snake from './snake'
 import Candy from './candy'
@@ -71,6 +74,28 @@ const renderer = new THREE.WebGLRenderer()
 renderer.setSize(sizes.width, sizes.height)
 document.body.appendChild(renderer.domElement)
 
+const composer = new EffectComposer(renderer)
+const renderPass = new RenderPass(scene, camera)
+composer.addPass(renderPass)
+
+const params = {
+	threshold: 0,
+	strength: 1,
+	radius: 1.5,
+	exposure: 1,
+}
+
+const bloomPass = new UnrealBloomPass(
+	new THREE.Vector2(window.innerWidth, window.innerHeight),
+	1.5,
+	0.4,
+	0.85
+)
+bloomPass.threshold = params.threshold
+bloomPass.strength = params.strength
+bloomPass.radius = params.radius
+composer.addPass(bloomPass)
+
 /**
  * muovo indietro la camera
  */
@@ -79,7 +104,7 @@ camera.position.set(0, resolution.x / 1.1, resolution.y / 0.9)
 
 const controls = new MapControls(camera, renderer.domElement)
 controls.enablePan = false
-// controls.enableRotate = false
+controls.enableRotate = false
 controls.target = new THREE.Vector3(0, 0, 2)
 
 /**
@@ -102,7 +127,7 @@ let candies = []
 /**
  * Point light
  */
-const pointLight = new THREE.PointLight(0xffffff, 4)
+const pointLight = new THREE.PointLight(0xffffff, 5)
 pointLight.position.y = 10
 scene.add(pointLight)
 
@@ -127,13 +152,15 @@ function animate() {
 	snake.candies.forEach((c) => {
 		c.uniforms.uTime.value = time
 	})
+	snake.uniforms.uTime.value = time
 
 	pointLight.position.x = snake.head.position.x
 	pointLight.position.z = snake.head.position.z + 4
 
 	controls.update()
 
-	renderer.render(scene, camera)
+	// renderer.render(scene, camera)
+	composer.render()
 
 	requestAnimationFrame(animate)
 }
@@ -152,6 +179,7 @@ window.addEventListener('resize', () => {
 
 	// update renderer
 	renderer.setSize(sizes.width, sizes.height)
+	composer.setSize(sizes.width, sizes.height)
 })
 
 const pixelRatio = Math.min(window.devicePixelRatio, 2)
