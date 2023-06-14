@@ -12,10 +12,13 @@ import Snake from './snake'
 import Candy from './candy'
 import Grid from './grid'
 
+let start = false
 let speed = 160
 let score = 0
 
-let text
+let font
+let textMesh
+let bestScoreMesh
 
 // const planeGeometry = new THREE.PlaneGeometry(...resolution, ...resolution)
 // planeGeometry.rotateX(Math.PI * 0.5)
@@ -38,7 +41,8 @@ const scene = new THREE.Scene()
 /**
  * Grid
  */
-const resolution = new THREE.Vector2(27, 17)
+
+const resolution = new THREE.Vector2(11, 11)
 const grid = new Grid(scene, resolution)
 
 /**
@@ -66,6 +70,9 @@ const camera = new THREE.PerspectiveCamera(
 	0.1,
 	500
 )
+
+// camera.zoom = 0.9
+// camera.updateProjectionMatrix()
 
 /**
  * renderer
@@ -99,13 +106,16 @@ composer.addPass(bloomPass)
 /**
  * muovo indietro la camera
  */
-camera.position.set(0, resolution.x / 1.1, resolution.y / 0.9)
+camera.position.set(0, resolution.y * 1.5, 10)
 // camera.lookAt(new THREE.Vector3())
 
 const controls = new MapControls(camera, renderer.domElement)
 controls.enablePan = false
 controls.enableRotate = false
 controls.target = new THREE.Vector3(0, 0, 2)
+
+controls.maxDistance = 50
+controls.minDistance = 15
 
 /**
  * velocità di rotazione radianti al secondo
@@ -130,6 +140,8 @@ let candies = []
 const pointLight = new THREE.PointLight(0xffffff, 5)
 pointLight.position.y = 10
 scene.add(pointLight)
+
+setResolution()
 
 /**
  * frame loop
@@ -157,6 +169,16 @@ function animate() {
 	pointLight.position.x = snake.head.position.x
 	pointLight.position.z = snake.head.position.z + 4
 
+	let scale = new THREE.Vector3(1, 1, 1)
+
+	if (textMesh) {
+		textMesh.scale.lerp(scale, 0.1)
+	}
+
+	if (bestScoreMesh) {
+		bestScoreMesh.scale.lerp(scale, 0.1)
+	}
+
 	controls.update()
 
 	// renderer.render(scene, camera)
@@ -180,20 +202,18 @@ window.addEventListener('resize', () => {
 	// update renderer
 	renderer.setSize(sizes.width, sizes.height)
 	composer.setSize(sizes.width, sizes.height)
+
+	setResolution()
 })
 
 const pixelRatio = Math.min(window.devicePixelRatio, 2)
 renderer.setPixelRatio(pixelRatio)
-
-let start = false
 
 window.addEventListener('keydown', function (e) {
 	// console.log(e.code)
 	// e.code === 'Space' ? (start = !start) : null
 	if (!start) {
 		start = true
-		score = 0
-		createScore()
 	}
 
 	snake.setDirection(e.code)
@@ -264,9 +284,9 @@ function addCandy() {
 	let x, y, z
 
 	do {
-		x = Math.floor((Math.random() - 0.5) * (resolution.x - 1))
+		x = Math.floor((Math.random() - 0.5) * Math.floor(resolution.x))
 		y = 0
-		z = Math.floor((Math.random() - 0.5) * (resolution.y - 1))
+		z = Math.floor((Math.random() - 0.5) * Math.floor(resolution.y))
 
 		pos.set(x, y, z)
 	} while (
@@ -286,7 +306,7 @@ function addCandy() {
 	candies.push(candy)
 }
 
-addCandy()
+// addCandy()
 
 window.addEventListener('die', reset)
 
@@ -305,37 +325,114 @@ function reset() {
 	candies = []
 
 	addCandy()
-}
 
-let font
-let textMesh
+	const bestScore = window.localStorage.getItem('bestScore') || 0
+
+	console.log('best score', window.localStorage.getItem('bestScore'), score)
+
+	if (score > bestScore) {
+		window.localStorage.setItem('bestScore', score)
+		createBestScore()
+	}
+
+	score = 0
+	createScore()
+}
 
 const loader = new FontLoader()
 loader.load(fontSrc, function (res) {
 	font = res
 
 	createScore()
+	createBestScore()
 })
 
 function createScore() {
-	const text = `score: ${score}`
-
-	const geometry = new TextGeometry(text, {
-		font,
-		size: 1.5,
-		height: 0.2,
-	})
-
-	geometry.computeBoundingBox()
-	const centerOffset =
-		-0.5 * (geometry.boundingBox.max.x - geometry.boundingBox.min.x)
+	const text = `Score:
+${score} pt`
 
 	if (textMesh) {
 		scene.remove(textMesh)
 	}
 
-	textMesh = new THREE.Mesh(geometry, new THREE.MeshNormalMaterial())
-	textMesh.position.z = -resolution.y / 2 - 2
-	textMesh.position.x = centerOffset
+	textMesh = createTextGeometry(text)
+	textMesh.position.z = -resolution.y / 2
+	textMesh.position.x = -resolution.x / 2 + 2
+	textMesh.position.y = 2
+	textMesh.rotation.x = -Math.PI * 0.5
+
+	textMesh.material.color.set(0xffffff)
 	scene.add(textMesh)
+}
+
+function createBestScore() {
+	let bestScore = window.localStorage.getItem('bestScore') || 0
+
+	const text = `Best score:
+${bestScore} pt`
+
+	if (bestScoreMesh) {
+		scene.remove(bestScoreMesh)
+	}
+
+	bestScoreMesh = createTextGeometry(text)
+	bestScoreMesh.position.z = resolution.y / 2 + 3
+	bestScoreMesh.position.x = -resolution.x / 2 + 2
+	bestScoreMesh.position.y = 2
+	bestScoreMesh.rotation.x = -Math.PI * 0.5
+	scene.add(bestScoreMesh)
+}
+
+function createTextGeometry(text, options = {}) {
+	const geometry = new TextGeometry(text, {
+		font,
+		size: 0.7,
+		height: 0.05,
+		...options,
+	})
+
+	// geometry.center()
+
+	let mesh = new THREE.Mesh(
+		geometry,
+		new THREE.MeshStandardMaterial({
+			color: 0x995500,
+			transparent: true,
+			opacity: 0.7,
+		})
+	)
+
+	mesh.scale.set(1.5, 1.5, 1.5)
+
+	return mesh
+}
+
+function setResolution() {
+	let col = Math.round(17 * (window.innerWidth / window.innerHeight))
+	if (col % 2 === 0) {
+		col++
+	}
+	col = THREE.MathUtils.clamp(col, 11, 33)
+
+	let row = Math.round((col * window.innerHeight) / window.innerWidth)
+
+	if (row % 2 == 0) {
+		row++
+	}
+	row = THREE.MathUtils.clamp(row, 11, 35)
+
+	resolution.x = col
+	resolution.y = row
+
+	grid.setResolution(resolution)
+
+	createScore()
+	createBestScore()
+
+	const maxDim = Math.max(resolution.x, resolution.y)
+
+	camera.position.set(0, maxDim * 1.5, maxDim * 0.9)
+
+	reset()
+	// controls.target.set(0, 0, -2)
 }

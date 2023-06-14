@@ -17,8 +17,7 @@ export default class Grid {
 
 	constructor(scene, resolution = new Vector2(10, 10)) {
 		this.scene = scene
-		this.resolution = resolution
-		this.uniforms.uRes.value = resolution.clone().multiplyScalar(0.5)
+		this.setResolution(resolution)
 
 		this.createGeometry()
 		this.createMaterial()
@@ -32,9 +31,14 @@ export default class Grid {
 		this.uniforms.uTime.value = time
 	}
 
+	setResolution(resolution) {
+		this.resolution = resolution
+		this.uniforms.uRes.value = resolution.clone().multiplyScalar(0.5)
+	}
+
 	createGeometry() {
 		const r = this.resolution.clone().multiplyScalar(5)
-		this.geometry = new PlaneGeometry(...r, ...r)
+		this.geometry = new PlaneGeometry(151, 151, 151, 151)
 		this.geometry.rotateX(-Math.PI * 0.5)
 	}
 
