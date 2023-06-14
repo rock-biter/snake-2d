@@ -361,7 +361,7 @@ ${score} pt`
 	}
 
 	textMesh = createTextGeometry(text)
-	textMesh.position.z = -resolution.y / 2
+	textMesh.position.z = -resolution.y / 2 - 1
 	textMesh.position.x = -resolution.x / 2 + 2
 	textMesh.position.y = 2
 	textMesh.rotation.x = -Math.PI * 0.5
