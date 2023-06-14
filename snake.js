@@ -358,6 +358,7 @@ float snoise(vec3 v){
 	}
 
 	setDirection(code) {
+		console.log(code)
 		switch (code) {
 			case 'ArrowLeft':
 				this.direction !== r ? (this.nextTicDirection = l) : null

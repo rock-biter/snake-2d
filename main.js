@@ -206,18 +206,23 @@ window.addEventListener('resize', () => {
 	setResolution()
 })
 
-const pixelRatio = Math.min(window.devicePixelRatio, 2)
+const pixelRatio = Math.min(window.devicePixelRatio, 3)
 renderer.setPixelRatio(pixelRatio)
+composer.setPixelRatio(pixelRatio)
 
 window.addEventListener('keydown', function (e) {
 	// console.log(e.code)
 	// e.code === 'Space' ? (start = !start) : null
-	if (!start) {
-		start = true
-	}
+	startGame()
 
 	snake.setDirection(e.code)
 })
+
+function startGame() {
+	if (!start) {
+		start = true
+	}
+}
 
 function tic() {
 	start && snake.move()
@@ -284,9 +289,9 @@ function addCandy() {
 	let x, y, z
 
 	do {
-		x = Math.floor((Math.random() - 0.5) * Math.floor(resolution.x))
+		x = Math.floor((Math.random() - 0.5) * Math.floor(resolution.x - 1))
 		y = 0
-		z = Math.floor((Math.random() - 0.5) * Math.floor(resolution.y))
+		z = Math.floor((Math.random() - 0.5) * Math.floor(resolution.y - 1))
 
 		pos.set(x, y, z)
 	} while (
@@ -433,6 +438,53 @@ function setResolution() {
 
 	camera.position.set(0, 5 + maxDim * 1.5, 5 + maxDim * 0.5)
 
+	snake.die()
 	reset()
 	// controls.target.set(0, 0, -2)
 }
+
+const prevTouch = new THREE.Vector2()
+let middle = 1.55
+let scale = 1
+
+window.addEventListener('touchstart', (event) => {
+	const touch = event.targetTouches[0]
+
+	middle = THREE.MathUtils.clamp(middle, 1.45, 1.65)
+
+	console.log(event)
+	let x, y
+	x = (2 * touch.clientX) / window.innerWidth - 1
+	y = (2 * touch.clientY) / window.innerHeight - middle
+
+	// if (Math.abs(x) < 0.15 && Math.abs(y) < 0.15) {
+	// 	return
+	// }
+
+	startGame()
+
+	console.log('click', x, y)
+
+	if (x * scale > y) {
+		if (x * scale < -y) {
+			snake.setDirection('ArrowUp')
+			scale = 3
+		} else {
+			snake.setDirection('ArrowRight')
+			middle += y
+			scale = 0.33
+		}
+	} else {
+		if (-x * scale > y) {
+			snake.setDirection('ArrowLeft')
+			middle += y
+			scale = 0.33
+		} else {
+			snake.setDirection('ArrowDown')
+			scale = 3
+		}
+	}
+
+	prevTouch.x = x
+	prevTouch.y = y
+})
