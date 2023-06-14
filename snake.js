@@ -61,7 +61,7 @@ export default class Snake {
 		this.addElem(vec.clone().multiplyScalar(2))
 		this.addElem(vec.clone().multiplyScalar(3))
 
-		console.log(this.elements.map((el) => el.position))
+		// console.log(this.elements.map((el) => el.position))
 
 		// this.head.scale.set(1.1, 1.1, 1.1)
 	}
@@ -358,7 +358,7 @@ float snoise(vec3 v){
 	}
 
 	setDirection(code) {
-		console.log(code)
+		// console.log(code)
 		switch (code) {
 			case 'ArrowLeft':
 				this.direction !== r ? (this.nextTicDirection = l) : null

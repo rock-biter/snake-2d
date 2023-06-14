@@ -130,7 +130,7 @@ const clock = new THREE.Clock()
 const snake = new Snake(scene, resolution)
 // scene.add(el)
 
-console.log(snake)
+// console.log(snake)
 
 let candies = []
 
@@ -266,7 +266,7 @@ function tic() {
 
 	if (index != null) {
 		candies.splice(index, 1)
-		console.log(index, candies)
+		// console.log(index, candies)
 	}
 
 	setTimeout(() => {
@@ -333,7 +333,7 @@ function reset() {
 
 	const bestScore = window.localStorage.getItem('bestScore') || 0
 
-	console.log('best score', window.localStorage.getItem('bestScore'), score)
+	// console.log('best score', window.localStorage.getItem('bestScore'), score)
 
 	if (score > bestScore) {
 		window.localStorage.setItem('bestScore', score)
@@ -452,7 +452,7 @@ window.addEventListener('touchstart', (event) => {
 
 	middle = THREE.MathUtils.clamp(middle, 1.45, 1.65)
 
-	console.log(event)
+	// console.log(event)
 	let x, y
 	x = (2 * touch.clientX) / window.innerWidth - 1
 	y = (2 * touch.clientY) / window.innerHeight - middle
@@ -463,7 +463,7 @@ window.addEventListener('touchstart', (event) => {
 
 	startGame()
 
-	console.log('click', x, y)
+	// console.log('click', x, y)
 
 	if (x * scale > y) {
 		if (x * scale < -y) {
