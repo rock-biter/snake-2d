@@ -408,18 +408,18 @@ function createTextGeometry(text, options = {}) {
 }
 
 function setResolution() {
-	let col = Math.round(17 * (window.innerWidth / window.innerHeight))
+	let col = Math.round(23 * (window.innerWidth / window.innerHeight))
 	if (col % 2 === 0) {
 		col++
 	}
-	col = THREE.MathUtils.clamp(col, 11, 33)
+	col = THREE.MathUtils.clamp(col, 11, 65)
 
 	let row = Math.round((col * window.innerHeight) / window.innerWidth)
 
 	if (row % 2 == 0) {
 		row++
 	}
-	row = THREE.MathUtils.clamp(row, 11, 35)
+	row = THREE.MathUtils.clamp(row, 11, 65)
 
 	resolution.x = col
 	resolution.y = row
@@ -431,7 +431,7 @@ function setResolution() {
 
 	const maxDim = Math.max(resolution.x, resolution.y)
 
-	camera.position.set(0, maxDim * 1.5, maxDim * 0.9)
+	camera.position.set(0, 5 + maxDim * 1.5, 5 + maxDim * 0.5)
 
 	reset()
 	// controls.target.set(0, 0, -2)
