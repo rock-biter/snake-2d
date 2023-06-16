@@ -361,15 +361,19 @@ float snoise(vec3 v){
 		// console.log(code)
 		switch (code) {
 			case 'ArrowLeft':
+			case 'KeyA':
 				this.direction !== r ? (this.nextTicDirection = l) : null
 				break
 			case 'ArrowRight':
+			case 'KeyD':
 				this.direction !== l ? (this.nextTicDirection = r) : null
 				break
+			case 'KeyS':
 			case 'ArrowDown':
 				this.direction !== u ? (this.nextTicDirection = d) : null
 				break
 			case 'ArrowUp':
+			case 'KeyW':
 				this.direction !== d ? (this.nextTicDirection = u) : null
 				break
 		}
